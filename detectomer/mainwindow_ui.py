@@ -10,7 +10,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
         super().__init__()
 
         self.graph_widget = pg.PlotWidget()
-        self.graph_widget.setBackground('k')
+        self.graph_widget.setBackground('#1A237E')
         self.graph_widget.showGrid(x=True, y=True, alpha=0.3)
         self.graph_widget.addLegend()
 
@@ -23,7 +23,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
 
         self.vslider = QtWidgets.QSlider(QtCore.Qt.Vertical)
         self.vslider.setRange(-100, 10)
-        self.vslider.setValue(-100)
+        self.vslider.setValue(0)
         self.vslider.valueChanged.connect(self.update_slider_label)
 
         self.hslider1 = QtWidgets.QSlider(QtCore.Qt.Horizontal)
@@ -108,8 +108,8 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.color_actions = []
 
         schemes = {
-            'Default (Black/White)': ('k', 'w'),
-            'Navy Blue/Light Blue': ('#1A237E', '#BBDEFB'),
+            '(Default) Navy Blue/Light Blue': ('#1A237E', '#BBDEFB'),
+            'Black (Black/White)': ('k', 'w'),
             'Dark Grey/Light Grey': ('#2C2C2C', '#E0E0E0'),
             'Deep Purple/Lavender': ('#311B92', '#E1BEE7'),
             'Pale Yellow/Dark Brown': ('#FFF9C4', 'k'),

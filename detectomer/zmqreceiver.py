@@ -45,18 +45,28 @@ class ZMQReceiver(MainWindowUI):
 
             data = self.socket.recv(flags=zmq.NOBLOCK)
             received_array = np.frombuffer(data, dtype=np.float32)
-            fft_data = 20 * np.log10(np.abs(np.fft.fft(received_array)))
+            fft_data = 10 * np.log10(np.abs(np.fft.fft(received_array)))
             self.graph_widget.plot(self.freqs[:512], fft_data[:512], pen='w', clear=True)
             self.graph_widget.addItem(self.red_line)
             self.graph_widget.addItem(self.green_line_1)
             self.graph_widget.addItem(self.green_line_2)
             
-            graph_max = np.max(fft_data)
+            pos1 = self.green_line_1.getPos()[0]
+            pos2 = self.green_line_2.getPos()[0]
+            
+            index1 = 0 if pos1 < 0 else 511 if pos1 > self.freqs[511] else pos1
+            index2 = 0 if pos2 < 0 else 511 if pos2 > self.freqs[511] else pos2
+            start_index = min(index1, index2)
+            end_index = max(index1, index2)
+            
+            graph_max = np.max(fft_data[start_index:end_index])
+            graph_max_index = np.argmax(fft_data[start_index:end_index])
+
             self.graph_max_label.setText(f'Graph Max: {graph_max:.2f} dBm')
 
             if graph_max > self.vslider.value():
                 self.statusBar().setStyleSheet("background-color: red; color: white; font-weight: bold;")
-                self.statusBar().showMessage("Threshold crossed!")
+                self.statusBar().showMessage("Threshold crossed, no message sent.")
                 self.writeLog()
 
                 if self.rest_checkbox.isChecked():
@@ -68,6 +78,8 @@ class ZMQReceiver(MainWindowUI):
                 self.statusBar().showMessage("Ready")
 
         except zmq.Again:
+            pass
+        except ValueError:
             pass
         except AttributeError:
             QtWidgets.QMessageBox.warning(self, "Error", "Please enter ZMQ address and port")
