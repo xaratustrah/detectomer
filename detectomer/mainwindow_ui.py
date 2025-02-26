@@ -213,4 +213,4 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.current_color_action = action
 
     def show_about_dialog(self):
-        QtWidgets.QMessageBox.information(self, "About", f"DETECT-O-MER\n© xaratustrah@github, 2025\nVersion {__version__}\n.")
+        QtWidgets.QMessageBox.information(self, "About", f"DETECT-O-MER\n© xaratustrah@github, 2025\nVersion {__version__}\n")
