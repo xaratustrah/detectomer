@@ -15,12 +15,13 @@ class ZMQReceiver(MainWindowUI):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
         
-        self.freqs = np.fft.fftfreq(1024, d=1.0/1024)
 
     def start_receiving(self):
         if not hasattr(self, 'zmq_url') or not hasattr(self, 'zmq_port'):
-            QtWidgets.QMessageBox.warning(self, "Error", "Please load a valid config file with ZMQ address and port")
+            QtWidgets.QMessageBox.warning(self, "Error", "Please load a valid config file.")
             return
+
+        self.freqs = np.fft.fftfreq(self.data_lframe, d=1.0/self.data_lframe)
 
         try:
             address = f"{self.zmq_url}:{self.zmq_port}"
@@ -46,7 +47,7 @@ class ZMQReceiver(MainWindowUI):
             data = self.socket.recv(flags=zmq.NOBLOCK)
             received_array = np.frombuffer(data, dtype=np.float32)
             fft_data = 10 * np.log10(np.abs(np.fft.fft(received_array)))
-            self.graph_widget.plot(self.freqs[:512], fft_data[:512], pen='w', clear=True)
+            self.graph_widget.plot(self.freqs[:int(self.data_lframe / 2)], fft_data[:int(self.data_lframe / 2)], pen='w', clear=True)
             self.graph_widget.addItem(self.red_line)
             self.graph_widget.addItem(self.green_line_1)
             self.graph_widget.addItem(self.green_line_2)
@@ -54,8 +55,8 @@ class ZMQReceiver(MainWindowUI):
             pos1 = self.green_line_1.getPos()[0]
             pos2 = self.green_line_2.getPos()[0]
             
-            index1 = 0 if pos1 < 0 else 511 if pos1 > self.freqs[511] else pos1
-            index2 = 0 if pos2 < 0 else 511 if pos2 > self.freqs[511] else pos2
+            index1 = 0 if pos1 < 0 else int(self.data_lframe / 2)-1 if pos1 > self.freqs[int(self.data_lframe / 2)-1] else pos1
+            index2 = 0 if pos2 < 0 else int(self.data_lframe / 2)-1 if pos2 > self.freqs[int(self.data_lframe / 2)-1] else pos2
             start_index = min(index1, index2)
             end_index = max(index1, index2)
             

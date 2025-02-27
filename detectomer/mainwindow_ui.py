@@ -193,9 +193,9 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 self.window_ysize = config['window']['ysize']
                 
                 self.hslider1.setRange(0, self.data_lframe - 1)
-                self.hslider1.setValue(int(self.data_lframe / 2) - 5)
+                self.hslider1.setValue(int(self.data_lframe / 4) - 5)
                 self.hslider2.setRange(0, self.data_lframe - 1)
-                self.hslider2.setValue(int(self.data_lframe / 2) + 5)
+                self.hslider2.setValue(int(self.data_lframe / 4) + 5)
 
                 self.graph_widget.setYRange(self.graph_ymin, self.graph_ymax)
                 self.vslider.setRange(self.graph_ymin, self.graph_ymax)

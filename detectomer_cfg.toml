@@ -3,13 +3,15 @@ url = "tcp://localhost"
 port = "5555"
 
 [data]
-lframe = 1024
+lframe = 2048
 
 [graph]
 ymax = 10
 ymin = -100
 xmax = 1000
 xmin = 0
+y_unit = "dBm"
+x_unit = "Hz"
 
 [window]
 xsize = 800

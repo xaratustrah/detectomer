@@ -5,7 +5,7 @@ import sys
 import select
 from loguru import logger
 
-lframe = 1024
+lframe = 2048
 
 def generate_noisy_sine_wave(freq=100, amplitude=1):
     t = np.linspace(0, 1, lframe)
