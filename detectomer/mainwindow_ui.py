@@ -31,9 +31,9 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.hslider1_label = QtWidgets.QLabel(f'Freq 1: {self.hslider1.value()} Hz')
         self.hslider2_label = QtWidgets.QLabel(f'Freq 2: {self.hslider2.value()} Hz')
 
-        self.inverse_checkbox = QtWidgets.QCheckBox("Inverse", self)
+        self.inverse_checkbox = QtWidgets.QCheckBox("Inverse condition?", self)
 
-        self.log_checkbox = QtWidgets.QCheckBox("Log?", self)
+        self.log_checkbox = QtWidgets.QCheckBox("Log to file?", self)
         self.log_checkbox.stateChanged.connect(self.toggleLog)
 
         self.rest_checkbox = QtWidgets.QCheckBox('Send REST?')
@@ -57,15 +57,17 @@ class MainWindowUI(QtWidgets.QMainWindow):
         graph_layout = QtWidgets.QVBoxLayout()
         graph_layout.addWidget(self.graph_widget)
 
-        label_layout = QtWidgets.QHBoxLayout()
-        label_layout.addWidget(self.graph_max_label)
-        label_layout.addWidget(self.vslider_label)
-        label_layout.addWidget(self.hslider1_label)
-        label_layout.addWidget(self.hslider2_label)
-        label_layout.addWidget(self.inverse_checkbox)
-        label_layout.addWidget(self.log_checkbox)
-        label_layout.addWidget(self.logFileName)
-        label_layout.addWidget(self.rest_checkbox)
+        label_layout1 = QtWidgets.QHBoxLayout()
+        label_layout1.addWidget(self.graph_max_label)
+        label_layout1.addWidget(self.vslider_label)
+        label_layout1.addWidget(self.hslider1_label)
+        label_layout1.addWidget(self.hslider2_label)
+        
+        label_layout2 = QtWidgets.QHBoxLayout()
+        label_layout2.addWidget(self.inverse_checkbox)
+        label_layout2.addWidget(self.rest_checkbox)
+        label_layout2.addWidget(self.log_checkbox)
+        label_layout2.addWidget(self.logFileName)
 
         vslider_layout = QtWidgets.QVBoxLayout()
         vslider_layout.addWidget(self.vslider)
@@ -87,7 +89,8 @@ class MainWindowUI(QtWidgets.QMainWindow):
         layout = QtWidgets.QVBoxLayout()
         layout.addLayout(main_layout)
         layout.addLayout(hslider_layout)
-        layout.addLayout(label_layout)
+        layout.addLayout(label_layout1)
+        layout.addLayout(label_layout2)
         layout.addLayout(button_layout)
 
         container = QtWidgets.QWidget()
