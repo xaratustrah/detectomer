@@ -122,6 +122,11 @@ class MainWindowUI(QtWidgets.QMainWindow):
         about_action.triggered.connect(self.show_about_dialog)
         about_menu.addAction(about_action)
 
+        file_menu = menubar.addMenu('File')
+        exit_action = QtWidgets.QAction('Exit', self)
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
+        
         self.statusBar().showMessage("Ready")
 
         self.setWindowTitle('DETECT-O-MER')
