@@ -176,6 +176,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
             try:
                 with open(file_name, 'r') as file:
                     config = toml.load(file)
+
                 self.zmq_url = config['zmq']['url']
                 self.zmq_port = config['zmq']['port']
                 self.data_lframe = config['data']['lframe']
