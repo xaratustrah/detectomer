@@ -14,26 +14,18 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.graph_widget.showGrid(x=True, y=True, alpha=0.3)
         self.graph_widget.addLegend()
 
-        self.graph_widget.setYRange(-100, 10)
-        self.graph_widget.setXRange(0, 1000)
         self.graph_widget.setLabel('left', 'Amplitude', units='dBm')
         self.graph_widget.setLabel('bottom', 'Frequency', units='Hz')
 
         self.graph_widget.sigRangeChanged.connect(self.update_slider_range)
 
         self.vslider = QtWidgets.QSlider(QtCore.Qt.Vertical)
-        self.vslider.setRange(-100, 10)
-        self.vslider.setValue(0)
         self.vslider.valueChanged.connect(self.update_slider_label)
 
         self.hslider1 = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.hslider1.setRange(0, 1023)
-        self.hslider1.setValue(512)
         self.hslider1.valueChanged.connect(self.update_hslider1_label)
 
         self.hslider2 = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.hslider2.setRange(0, 1023)
-        self.hslider2.setValue(512)
         self.hslider2.valueChanged.connect(self.update_hslider2_label)
 
         self.vslider_label = QtWidgets.QLabel(f'Threshold: {self.vslider.value()} dBm')
@@ -187,12 +179,34 @@ class MainWindowUI(QtWidgets.QMainWindow):
             try:
                 with open(file_name, 'r') as file:
                     config = toml.load(file)
-                if 'zmq' in config and 'url' in config['zmq'] and 'port' in config['zmq']:
-                    self.zmq_url = config['zmq']['url']
-                    self.zmq_port = config['zmq']['port']
-                    self.statusBar().showMessage(f"Config Loaded: ZMQ URL - {self.zmq_url}, Port - {self.zmq_port}")
-                else:
-                    QtWidgets.QMessageBox.warning(self, "Error", "Invalid config file. Please provide a valid ZMQ address and port.")
+                #if 'zmq' in config and 'url' in config['zmq'] and 'port' in config['zmq']:
+                self.zmq_url = config['zmq']['url']
+                self.zmq_port = config['zmq']['port']
+                self.data_lframe = config['data']['lframe']
+                
+                self.graph_xmin = config['graph']['xmin']
+                self.graph_xmax = config['graph']['xmax']
+                self.graph_ymin = config['graph']['ymin']
+                self.graph_ymax = config['graph']['ymax']
+                
+                self.window_xsize = config['window']['xsize']
+                self.window_ysize = config['window']['ysize']
+                
+                self.hslider1.setRange(0, self.data_lframe - 1)
+                self.hslider1.setValue(int(self.data_lframe / 2) - 5)
+                self.hslider2.setRange(0, self.data_lframe - 1)
+                self.hslider2.setValue(int(self.data_lframe / 2) + 5)
+
+                self.graph_widget.setYRange(self.graph_ymin, self.graph_ymax)
+                self.vslider.setRange(self.graph_ymin, self.graph_ymax)
+                self.vslider.setValue(self.graph_ymax - 10)
+                self.graph_widget.setXRange(self.graph_xmin, self.graph_xmax)
+
+                self.resize(self.window_xsize, self.window_ysize)
+
+                self.statusBar().showMessage(f"Config Loaded: ZMQ URL - {self.zmq_url}, Port - {self.zmq_port}")
+            #else:
+                #    QtWidgets.QMessageBox.warning(self, "Error", "Invalid config file.")
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self, "Error", f"Failed to load config file: {e}")
 

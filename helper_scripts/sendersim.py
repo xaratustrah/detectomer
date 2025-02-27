@@ -5,8 +5,10 @@ import sys
 import select
 from loguru import logger
 
+lframe = 1024
+
 def generate_noisy_sine_wave(freq=100, amplitude=1):
-    t = np.linspace(0, 1, 1024)
+    t = np.linspace(0, 1, lframe)
     sine_wave = amplitude * np.sin(2 * np.pi * freq * t)
     noise = np.random.normal(0, 0.1, sine_wave.shape)
     return (sine_wave + noise).astype(np.float32)
@@ -32,7 +34,7 @@ while True:
             data = generate_noisy_sine_wave(200, 1) + generate_noisy_sine_wave(160, 0.4)
         else:
             data = generate_noisy_sine_wave(200, 1)
-            #data = np.random.normal(0, 0.1, 1024).astype(np.float32)
+            #data = np.random.normal(0, 0.1, lframe).astype(np.float32)
 
         data *= 1e-6  # Multiply everything by 1e-6
         socket.send(data.tobytes())
