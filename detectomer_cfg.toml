@@ -10,8 +10,8 @@ ymax = 10
 ymin = -100
 xmax = 1000
 xmin = 0
-y_unit = "dBm"
-x_unit = "Hz"
+yunit = "dBm"
+xunit = "Hz"
 
 [window]
 xsize = 800

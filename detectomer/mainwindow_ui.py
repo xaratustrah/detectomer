@@ -14,9 +14,6 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.graph_widget.showGrid(x=True, y=True, alpha=0.3)
         self.graph_widget.addLegend()
 
-        self.graph_widget.setLabel('left', 'Amplitude', units='dBm')
-        self.graph_widget.setLabel('bottom', 'Frequency', units='Hz')
-
         self.graph_widget.sigRangeChanged.connect(self.update_slider_range)
 
         self.vslider = QtWidgets.QSlider(QtCore.Qt.Vertical)
@@ -188,10 +185,12 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 self.graph_xmax = config['graph']['xmax']
                 self.graph_ymin = config['graph']['ymin']
                 self.graph_ymax = config['graph']['ymax']
-                
+                self.graph_xunit = config['graph']['xunit']
+                self.graph_yunit = config['graph']['yunit']
+
                 self.window_xsize = config['window']['xsize']
                 self.window_ysize = config['window']['ysize']
-                
+                                
                 self.hslider1.setRange(0, self.data_lframe - 1)
                 self.hslider1.setValue(int(self.data_lframe / 4) - 5)
                 self.hslider2.setRange(0, self.data_lframe - 1)
@@ -201,6 +200,9 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 self.vslider.setRange(self.graph_ymin, self.graph_ymax)
                 self.vslider.setValue(self.graph_ymax - 10)
                 self.graph_widget.setXRange(self.graph_xmin, self.graph_xmax)
+
+                self.graph_widget.setLabel('left', 'Amplitude', units=self.graph_yunit)
+                self.graph_widget.setLabel('bottom', 'Frequency', units=self.graph_xunit)
 
                 self.resize(self.window_xsize, self.window_ysize)
 
