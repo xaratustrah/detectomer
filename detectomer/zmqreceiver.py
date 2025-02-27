@@ -46,7 +46,12 @@ class ZMQReceiver(MainWindowUI):
 
             data = self.socket.recv(flags=zmq.NOBLOCK)
             received_array = np.frombuffer(data, dtype=np.float32)
+            
             fft_data = 10 * np.log10(np.abs(np.fft.fft(received_array)))
+            
+            if self.inverse_checkbox.isChecked():
+                fft_data = -fft_data - int(self.inverse_ref_value_lineedit.text())
+                
             self.graph_widget.plot(self.freqs[:int(self.data_lframe / 2)], fft_data[:int(self.data_lframe / 2)], pen='w', clear=True)
             self.graph_widget.addItem(self.red_line)
             self.graph_widget.addItem(self.green_line_1)

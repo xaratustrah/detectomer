@@ -32,16 +32,23 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.hslider2_label = QtWidgets.QLabel(f'Freq 2: {self.hslider2.value()} Hz')
 
         self.inverse_checkbox = QtWidgets.QCheckBox("Inverse condition?", self)
+        self.inverse_checkbox.stateChanged.connect(self.toggle_ref_value)
 
         self.log_checkbox = QtWidgets.QCheckBox("Log to file?", self)
         self.log_checkbox.stateChanged.connect(self.toggleLog)
 
         self.rest_checkbox = QtWidgets.QCheckBox('Send REST?')
 
-        self.logFileName = QtWidgets.QLineEdit(self)
-        self.logFileName.setPlaceholderText("Log file name")
-        self.logFileName.setDisabled(True)
-        self.setDefaultLogFileName()
+        self.log_filename = QtWidgets.QLineEdit(self)
+        self.log_filename.setPlaceholderText("Log file name")
+        self.log_filename.setDisabled(True)
+        self.set_default_log_filename()
+
+        self.inverse_ref_value_label = QtWidgets.QLabel('Ref Value:')
+        self.inverse_ref_value_lineedit = QtWidgets.QLineEdit(self)
+        self.inverse_ref_value_lineedit.setPlaceholderText("80")
+        self.inverse_ref_value_lineedit.setDisabled(True)
+        self.set_default_inverse_ref_value()
 
         self.load_button = QtWidgets.QPushButton('Load Config File')
         self.load_button.clicked.connect(self.load_config_file)
@@ -65,9 +72,11 @@ class MainWindowUI(QtWidgets.QMainWindow):
         
         label_layout2 = QtWidgets.QHBoxLayout()
         label_layout2.addWidget(self.inverse_checkbox)
+        label_layout2.addWidget(self.inverse_ref_value_label)
+        label_layout2.addWidget(self.inverse_ref_value_lineedit)
         label_layout2.addWidget(self.rest_checkbox)
         label_layout2.addWidget(self.log_checkbox)
-        label_layout2.addWidget(self.logFileName)
+        label_layout2.addWidget(self.log_filename)
 
         vslider_layout = QtWidgets.QVBoxLayout()
         vslider_layout.addWidget(self.vslider)
@@ -142,19 +151,28 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.green_line_1 = self.graph_widget.addLine(x=self.hslider1.value(), y=0, pen=pg.mkPen('g', width=1))
         self.green_line_2 = self.graph_widget.addLine(x=self.hslider2.value(), y=0, pen=pg.mkPen('g', width=1))
 
-    def setDefaultLogFileName(self):
+    def set_default_inverse_ref_value(self):
+        self.inverse_ref_value_lineedit.setText(f"80")
+
+    def toggle_ref_value(self, state):
+        if state == 2:  # Checked
+            self.inverse_ref_value_lineedit.setDisabled(False)
+        else:
+            self.inverse_ref_value_lineedit.setDisabled(True)
+
+    def set_default_log_filename(self):
         now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.logFileName.setText(f"{now}.log")
+        self.log_filename.setText(f"{now}.log")
 
     def toggleLog(self, state):
         if state == 2:  # Checked
-            self.logFileName.setDisabled(False)
+            self.log_filename.setDisabled(False)
         else:
-            self.logFileName.setDisabled(True)
+            self.log_filename.setDisabled(True)
 
     def writeLog(self):
         if self.log_checkbox.isChecked():
-            log_file = self.logFileName.text()
+            log_file = self.log_filename.text()
             if log_file:
                 with open(log_file, "a") as f:
                     now = datetime.datetime.now()
