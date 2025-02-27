@@ -33,8 +33,8 @@ class MainWindowUI(QtWidgets.QMainWindow):
 
         self.rest_checkbox = QtWidgets.QCheckBox('Send REST?')
 
-        self.logCheckbox = QtWidgets.QCheckBox("Log?", self)
-        self.logCheckbox.stateChanged.connect(self.toggleLog)
+        self.log_checkbox = QtWidgets.QCheckBox("Log?", self)
+        self.log_checkbox.stateChanged.connect(self.toggleLog)
 
         self.logFileName = QtWidgets.QLineEdit(self)
         self.logFileName.setPlaceholderText("Log file name")
@@ -61,7 +61,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
         label_layout.addWidget(self.hslider1_label)
         label_layout.addWidget(self.hslider2_label)
         label_layout.addWidget(self.rest_checkbox)
-        label_layout.addWidget(self.logCheckbox)
+        label_layout.addWidget(self.log_checkbox)
         label_layout.addWidget(self.logFileName)
 
         vslider_layout = QtWidgets.QVBoxLayout()
@@ -142,7 +142,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
             self.logFileName.setDisabled(True)
 
     def writeLog(self):
-        if self.logCheckbox.isChecked():
+        if self.log_checkbox.isChecked():
             log_file = self.logFileName.text()
             if log_file:
                 with open(log_file, "a") as f:
