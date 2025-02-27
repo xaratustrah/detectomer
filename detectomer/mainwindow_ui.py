@@ -176,7 +176,6 @@ class MainWindowUI(QtWidgets.QMainWindow):
             try:
                 with open(file_name, 'r') as file:
                     config = toml.load(file)
-                #if 'zmq' in config and 'url' in config['zmq'] and 'port' in config['zmq']:
                 self.zmq_url = config['zmq']['url']
                 self.zmq_port = config['zmq']['port']
                 self.data_lframe = config['data']['lframe']
@@ -207,8 +206,6 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 self.resize(self.window_xsize, self.window_ysize)
 
                 self.statusBar().showMessage(f"Config Loaded: ZMQ URL - {self.zmq_url}, Port - {self.zmq_port}")
-            #else:
-                #    QtWidgets.QMessageBox.warning(self, "Error", "Invalid config file.")
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self, "Error", f"Failed to load config file: {e}")
 
