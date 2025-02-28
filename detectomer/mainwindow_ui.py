@@ -107,6 +107,16 @@ class MainWindowUI(QtWidgets.QMainWindow):
 
         menubar = self.menuBar()
 
+        file_menu = menubar.addMenu('File')
+        exit_action = QtWidgets.QAction('Exit', self)
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
+        
+        about_menu = menubar.addMenu('About')
+        about_action = QtWidgets.QAction('About', self)
+        about_action.triggered.connect(self.show_about_dialog)
+        about_menu.addAction(about_action)
+
         color_menu = menubar.addMenu('Color Scheme')
         self.color_actions = []
 
@@ -131,16 +141,6 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.color_actions[0].setChecked(True)
         self.current_color_action = self.color_actions[0]
 
-        about_menu = menubar.addMenu('About')
-        about_action = QtWidgets.QAction('About', self)
-        about_action.triggered.connect(self.show_about_dialog)
-        about_menu.addAction(about_action)
-
-        file_menu = menubar.addMenu('File')
-        exit_action = QtWidgets.QAction('Exit', self)
-        exit_action.triggered.connect(self.close)
-        file_menu.addAction(exit_action)
-        
         self.statusBar().showMessage("Ready")
 
         self.setWindowTitle('DETECT-O-MER')
