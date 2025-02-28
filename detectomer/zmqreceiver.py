@@ -50,7 +50,7 @@ class ZMQReceiver(MainWindowUI):
             fft_data = 10 * np.log10(np.abs(np.fft.fft(received_array)))
             
             if self.inverse_checkbox.isChecked():
-                fft_data = -fft_data - int(self.inverse_ref_value_lineedit.text())
+                fft_data = -fft_data - int(self.ref_value_spinbox.value())
                 
             self.graph_widget.plot(self.freqs[:int(self.data_lframe / 2)], fft_data[:int(self.data_lframe / 2)], pen='w', clear=True)
             self.graph_widget.addItem(self.red_line)
@@ -68,9 +68,21 @@ class ZMQReceiver(MainWindowUI):
             graph_max = np.max(fft_data[start_index:end_index])
             graph_max_index = np.argmax(fft_data[start_index:end_index])
 
+            graph_min = np.min(fft_data[start_index:end_index])
+            graph_min_index = np.argmin(fft_data[start_index:end_index])
+
             self.graph_max_label.setText(f'Graph Max: {graph_max:.2f} dBm')
 
-            if graph_max > self.vslider.value():
+            if graph_max > self.vslider.value() and not self.inverse_checkbox.isChecked():
+                self.statusBar().setStyleSheet("background-color: red; color: white; font-weight: bold;")
+                self.statusBar().showMessage("Threshold crossed, no message sent.")
+                self.writeLog()
+
+                if self.rest_checkbox.isChecked():
+                    self.statusBar().setStyleSheet("background-color: purple; color: yellow; font-weight: bold;")
+                    self.statusBar().showMessage("Threshold crossed, sending REST message!")
+
+            elif graph_min < self.vslider.value() and self.inverse_checkbox.isChecked():
                 self.statusBar().setStyleSheet("background-color: red; color: white; font-weight: bold;")
                 self.statusBar().showMessage("Threshold crossed, no message sent.")
                 self.writeLog()

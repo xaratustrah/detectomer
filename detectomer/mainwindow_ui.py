@@ -31,24 +31,23 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.hslider1_label = QtWidgets.QLabel(f'Freq 1: {self.hslider1.value()} Hz')
         self.hslider2_label = QtWidgets.QLabel(f'Freq 2: {self.hslider2.value()} Hz')
 
-        self.inverse_checkbox = QtWidgets.QCheckBox("Inverse condition?", self)
-        self.inverse_checkbox.stateChanged.connect(self.toggle_ref_value)
+        self.inverse_checkbox = QtWidgets.QCheckBox("Invert", self)
+        self.inverse_checkbox.stateChanged.connect(self.toggle_inverse_checkbox)
 
-        self.log_checkbox = QtWidgets.QCheckBox("Log to file?", self)
-        self.log_checkbox.stateChanged.connect(self.toggleLog)
+        self.log_checkbox = QtWidgets.QCheckBox("Log to file:", self)
+        self.log_checkbox.stateChanged.connect(self.toggle_log_checkbox)
 
-        self.rest_checkbox = QtWidgets.QCheckBox('Send REST?')
+        self.rest_checkbox = QtWidgets.QCheckBox('Send REST')
 
         self.log_filename = QtWidgets.QLineEdit(self)
         self.log_filename.setPlaceholderText("Log file name")
         self.log_filename.setDisabled(True)
         self.set_default_log_filename()
 
-        self.inverse_ref_value_label = QtWidgets.QLabel('Ref Value:')
-        self.inverse_ref_value_lineedit = QtWidgets.QLineEdit(self)
-        self.inverse_ref_value_lineedit.setPlaceholderText("80")
-        self.inverse_ref_value_lineedit.setDisabled(True)
-        self.set_default_inverse_ref_value()
+        self.ref_value_label = QtWidgets.QLabel('Ref Level:')
+        self.ref_value_spinbox = QtWidgets.QSpinBox()
+        self.ref_value_spinbox.setRange(0, 100)  # Set range from 0 to 100
+        self.ref_value_spinbox.setValue(0) 
 
         self.load_button = QtWidgets.QPushButton('Load Config File')
         self.load_button.clicked.connect(self.load_config_file)
@@ -71,9 +70,9 @@ class MainWindowUI(QtWidgets.QMainWindow):
         label_layout1.addWidget(self.hslider2_label)
         
         label_layout2 = QtWidgets.QHBoxLayout()
+        label_layout2.addWidget(self.ref_value_label)
+        label_layout2.addWidget(self.ref_value_spinbox)
         label_layout2.addWidget(self.inverse_checkbox)
-        label_layout2.addWidget(self.inverse_ref_value_label)
-        label_layout2.addWidget(self.inverse_ref_value_lineedit)
         label_layout2.addWidget(self.rest_checkbox)
         label_layout2.addWidget(self.log_checkbox)
         label_layout2.addWidget(self.log_filename)
@@ -151,20 +150,17 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.green_line_1 = self.graph_widget.addLine(x=self.hslider1.value(), y=0, pen=pg.mkPen('g', width=1))
         self.green_line_2 = self.graph_widget.addLine(x=self.hslider2.value(), y=0, pen=pg.mkPen('g', width=1))
 
-    def set_default_inverse_ref_value(self):
-        self.inverse_ref_value_lineedit.setText(f"80")
-
-    def toggle_ref_value(self, state):
+    def toggle_inverse_checkbox(self, state):
         if state == 2:  # Checked
-            self.inverse_ref_value_lineedit.setDisabled(False)
+            self.ref_value_spinbox.setValue(80)
         else:
-            self.inverse_ref_value_lineedit.setDisabled(True)
+            self.ref_value_spinbox.setValue(0)
 
     def set_default_log_filename(self):
         now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.log_filename.setText(f"{now}.log")
 
-    def toggleLog(self, state):
+    def toggle_log_checkbox(self, state):
         if state == 2:  # Checked
             self.log_filename.setDisabled(False)
         else:
@@ -256,4 +252,4 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.current_color_action = action
 
     def show_about_dialog(self):
-        QtWidgets.QMessageBox.information(self, "About", f"DETECT-O-MER\n© xaratustrah@github, 2025\nVersion {__version__}\n")
+        QtWidgets.QMessageBox.information(self, "About", f"DETECT-O-MER\n© 2025 Shahab Sanjari (xaratustrah@github)\nVersion {__version__}\n")
