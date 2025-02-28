@@ -108,12 +108,12 @@ class MainWindowUI(QtWidgets.QMainWindow):
         menubar = self.menuBar()
 
         file_menu = menubar.addMenu('File')
-        exit_action = QtWidgets.QAction('Exit', self)
-        exit_action.triggered.connect(self.close)
-        file_menu.addAction(exit_action)
         about_action = QtWidgets.QAction('About', self)
         about_action.triggered.connect(self.show_about_dialog)
         file_menu.addAction(about_action)
+        exit_action = QtWidgets.QAction('Exit', self)
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
 
         color_menu = menubar.addMenu('Color Scheme')
         self.color_actions = []
