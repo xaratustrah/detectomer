@@ -16,3 +16,9 @@ xunit = "Hz"
 [window]
 xsize = 800
 ysize = 600
+
+[rest]
+url = "tcp://localhost:5556"
+SCID = 2222
+
+

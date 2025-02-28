@@ -31,13 +31,21 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.hslider1_label = QtWidgets.QLabel(f'Freq 1: {self.hslider1.value()} Hz')
         self.hslider2_label = QtWidgets.QLabel(f'Freq 2: {self.hslider2.value()} Hz')
 
-        self.inverse_checkbox = QtWidgets.QCheckBox("Invert", self)
+        self.inverse_checkbox = QtWidgets.QCheckBox("Invert graph", self)
         self.inverse_checkbox.stateChanged.connect(self.toggle_inverse_checkbox)
 
         self.log_checkbox = QtWidgets.QCheckBox("Log to file:", self)
         self.log_checkbox.stateChanged.connect(self.toggle_log_checkbox)
 
         self.rest_checkbox = QtWidgets.QCheckBox('Send REST')
+        self.rest_checkbox.stateChanged.connect(self.toggle_rest_checkbox)
+        
+        self.rest_hold_time_label = QtWidgets.QLabel('Hold time [s]:')
+        self.rest_hold_time_label.setDisabled(True)
+        self.rest_hold_time_spinbox = QtWidgets.QSpinBox()
+        self.rest_hold_time_spinbox.setRange(0, 9999)  # Set range from 0 to 100
+        self.rest_hold_time_spinbox.setValue(1)
+        self.rest_hold_time_spinbox.setDisabled(True)
 
         self.log_filename = QtWidgets.QLineEdit(self)
         self.log_filename.setPlaceholderText("Log file name")
@@ -68,12 +76,14 @@ class MainWindowUI(QtWidgets.QMainWindow):
         label_layout1.addWidget(self.vslider_label)
         label_layout1.addWidget(self.hslider1_label)
         label_layout1.addWidget(self.hslider2_label)
+        label_layout1.addWidget(self.inverse_checkbox)
+        label_layout1.addWidget(self.ref_value_label)
+        label_layout1.addWidget(self.ref_value_spinbox)
         
         label_layout2 = QtWidgets.QHBoxLayout()
-        label_layout2.addWidget(self.ref_value_label)
-        label_layout2.addWidget(self.ref_value_spinbox)
-        label_layout2.addWidget(self.inverse_checkbox)
         label_layout2.addWidget(self.rest_checkbox)
+        label_layout2.addWidget(self.rest_hold_time_label)
+        label_layout2.addWidget(self.rest_hold_time_spinbox)
         label_layout2.addWidget(self.log_checkbox)
         label_layout2.addWidget(self.log_filename)
 
@@ -148,6 +158,14 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.green_line_1 = self.graph_widget.addLine(x=self.hslider1.value(), y=0, pen=pg.mkPen('g', width=1))
         self.green_line_2 = self.graph_widget.addLine(x=self.hslider2.value(), y=0, pen=pg.mkPen('g', width=1))
 
+    def toggle_rest_checkbox(self, state):
+        if state == 2:  # Checked
+            self.rest_hold_time_spinbox.setDisabled(False)
+            self.rest_hold_time_label.setDisabled(False)
+        else:
+            self.rest_hold_time_spinbox.setDisabled(True)
+            self.rest_hold_time_label.setDisabled(True)
+
     def toggle_inverse_checkbox(self, state):
         if state == 2:  # Checked
             self.ref_value_spinbox.setValue(80)
@@ -214,6 +232,9 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 self.window_xsize = config['window']['xsize']
                 self.window_ysize = config['window']['ysize']
                                 
+                self.rest_url = config['rest']['url']
+                self.rest_scid = config['rest']['SCID']
+                
                 self.hslider1.setRange(0, self.data_lframe - 1)
                 self.hslider1.setValue(int(self.data_lframe / 4) - 5)
                 self.hslider2.setRange(0, self.data_lframe - 1)
