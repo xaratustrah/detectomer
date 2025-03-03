@@ -31,8 +31,8 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.hslider1_label = QtWidgets.QLabel(f'Freq 1: {self.hslider1.value()} Hz')
         self.hslider2_label = QtWidgets.QLabel(f'Freq 2: {self.hslider2.value()} Hz')
 
-        self.inverse_checkbox = QtWidgets.QCheckBox("Invert graph", self)
-        self.inverse_checkbox.stateChanged.connect(self.toggle_inverse_checkbox)
+        self.invert_checkbox = QtWidgets.QCheckBox("Invert graph", self)
+        self.invert_checkbox.stateChanged.connect(self.toggle_invert_checkbox)
 
         self.log_checkbox = QtWidgets.QCheckBox("Log to file:", self)
         self.log_checkbox.stateChanged.connect(self.toggle_log_checkbox)
@@ -76,7 +76,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
         label_layout1.addWidget(self.vslider_label)
         label_layout1.addWidget(self.hslider1_label)
         label_layout1.addWidget(self.hslider2_label)
-        label_layout1.addWidget(self.inverse_checkbox)
+        label_layout1.addWidget(self.invert_checkbox)
         label_layout1.addWidget(self.ref_value_label)
         label_layout1.addWidget(self.ref_value_spinbox)
         
@@ -166,7 +166,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
             self.rest_hold_time_spinbox.setDisabled(True)
             self.rest_hold_time_label.setDisabled(True)
 
-    def toggle_inverse_checkbox(self, state):
+    def toggle_invert_checkbox(self, state):
         if state == 2:  # Checked
             self.ref_value_spinbox.setValue(80)
         else:

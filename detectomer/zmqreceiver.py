@@ -53,7 +53,7 @@ class ZMQReceiver(MainWindowUI):
             
             fft_data = 10 * np.log10(np.abs(np.fft.fft(received_array)))
             
-            if self.inverse_checkbox.isChecked():
+            if self.invert_checkbox.isChecked():
                 fft_data = -fft_data - int(self.ref_value_spinbox.value())
             else:
                 fft_data += int(self.ref_value_spinbox.value())
@@ -79,14 +79,14 @@ class ZMQReceiver(MainWindowUI):
 
             self.graph_max_label.setText(f'Graph Max: {graph_max:.2f} dBm')
 
-            if graph_max > self.vslider.value() and not self.inverse_checkbox.isChecked():
+            if graph_max > self.vslider.value() and not self.invert_checkbox.isChecked():
                 if self.rest_checkbox.isChecked():
                     self.toggle_rest_message()
                 else:
                     self.only_show_message()
                     self.writeLog()
 
-            if graph_min < self.vslider.value() and self.inverse_checkbox.isChecked():
+            if graph_min < self.vslider.value() and self.invert_checkbox.isChecked():
                 if self.rest_checkbox.isChecked():
                     self.toggle_rest_message()
                 else:
