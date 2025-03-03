@@ -33,7 +33,7 @@ while True:
         if send_sine_wave:
             data = generate_noisy_sine_wave(200, 1) + generate_noisy_sine_wave(160, 0.4)
         else:
-            data = generate_noisy_sine_wave(200, 1)
+            data = generate_noisy_sine_wave(200, 1)+ generate_noisy_sine_wave(160, 0.4)
             #data = np.random.normal(0, 0.1, lframe).astype(np.float32)
 
         data *= 1e-6  # Multiply everything by 1e-6
