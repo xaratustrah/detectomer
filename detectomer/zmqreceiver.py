@@ -138,12 +138,14 @@ class ZMQReceiver(MainWindowUI):
             try:
                 response = requests.put(self.rest_url, json=data, headers=headers)
                 response.raise_for_status()  # Check for HTTP errors
-                print(response.json())
+                #print(response.json())
         
             except HTTPError as http_err:
+                pass
                 print(f"HTTP error occurred: {http_err}")
         
             except Exception as err:
+                pass
                 print(f"Other error occurred: {err}")
         
         else:
