@@ -119,20 +119,21 @@ class ZMQReceiver(MainWindowUI):
             self.statusBar().clearMessage()
         
     def actually_send_rest_message(self, status):
+        headers = {
+            "Content-Type": "application/json"
+        }
+
         if status:
             self.statusBar().setStyleSheet("background-color: purple; color: yellow; font-weight: bold;")
             self.statusBar().showMessage(f"Threshold crossed, holding REST message for {self.rest_hold_time_spinbox.value()} [s]")
             data = {
                 "dynamicSignals": [
                     {
-                        "enabled": status,
+                        "enabled": True,
                         "id": self.rest_scid
                     }
                 ],
                 "staticSignals": []
-            }
-            headers = {
-                "Content-Type": "application/json"
             }
             try:
                 response = requests.put(self.rest_url, json=data, headers=headers)
@@ -146,4 +147,28 @@ class ZMQReceiver(MainWindowUI):
                 print(f"Other error occurred: {err}")
         
         else:
-            self.clear_up_statusbar()
+            data = {
+                "dynamicSignals": [
+                    {
+                        "enabled": False,
+                        "id": self.rest_scid
+                    }
+                ],
+                "staticSignals": []
+            }
+            try:
+                response = requests.put(self.rest_url, json=data, headers=headers)
+                response.raise_for_status()  # Check for HTTP errors
+                #print(response.json())
+                
+            except HTTPError as http_err:
+                pass
+                print(f"HTTP error occurred: {http_err}")
+        
+            except Exception as err:
+                pass
+                print(f"Other error occurred: {err}")
+
+            finally:
+                # clear up anyways
+                self.clear_up_statusbar()
