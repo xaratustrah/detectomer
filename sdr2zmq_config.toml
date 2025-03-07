@@ -1,0 +1,18 @@
+# Settings
+
+[sdr]
+sample_rate = 2.048e6  # Hz, sample rate for the SDR
+center_freq = 414e6     # Hz, center frequency for the SDR
+freq_correction = 60   # PPM, frequency correction
+sleep_time = 0.1       # seconds 
+gain = 0          # Gain setting
+
+# choose gain between [0.0, 0.9, 1.4, 2.7, 3.7, 7.7, 8.7,
+# 12.5, 14.4, 15.7, 16.6, 19.7, 20.7, 22.9, 25.4,
+# 28.0, 29.7, 32.8, 33.8, 36.4, 37.2, 38.6, 40.2,
+# 42.1, 43.4, 43.9, 44.5, 48.0, 49.6]
+# or use 'auto'
+
+[zmq]
+# Address for the ZMQ PUB socket
+address = "tcp://*:5555"

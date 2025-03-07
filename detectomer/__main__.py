@@ -1,3 +1,9 @@
+#
+# detectomer
+# 
+# (2025) xaratustrah@github
+#
+
 import sys
 import os
 from pyqtgraph.Qt import QtWidgets
