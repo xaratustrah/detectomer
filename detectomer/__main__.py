@@ -1,5 +1,5 @@
 #
-# detectomer
+# SDR2ZMQ
 # 
 # (2025) xaratustrah@github
 #

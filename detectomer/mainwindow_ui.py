@@ -221,6 +221,8 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 self.zmq_url = config['zmq']['url']
                 self.zmq_port = config['zmq']['port']
                 self.data_lframe = config['data']['lframe']
+                self.data_sample_rate = config['data']['sample_rate']
+                self.data_center_freq = config['data']['center_freq']
                 
                 self.graph_xmin = config['graph']['xmin']
                 self.graph_xmax = config['graph']['xmax']

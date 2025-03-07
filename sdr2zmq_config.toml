@@ -1,4 +1,4 @@
-# Settings
+# Settings for sdr2zmq
 
 [sdr]
 sample_rate = 2.048e6  # Hz, sample rate for the SDR
