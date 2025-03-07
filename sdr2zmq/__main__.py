@@ -13,12 +13,6 @@ from time import sleep
 from loguru import logger
 from rtlsdr import RtlSdr
 
-# Configure logging
-logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
-
-# Load configuration from TOML file
-config = toml.load("config.toml")
-
 # Function to validate the presence of required keys in the config
 def validate_config(config):
     required_keys = {
@@ -33,48 +27,60 @@ def validate_config(config):
             if key not in config[section]:
                 raise KeyError(f"Missing key: {key} in section: {section}")
 
-# Validate config
-try:
-    validate_config(config)
-except KeyError as e:
-    logger.error(f"Configuration error: {e}")
-    sys.exit(1)
-
-# Initialize SDR
-sdr = RtlSdr()
-
 def signal_handler(sig, frame):
     logger.info("Cancellation received, closing devices.")
     sdr.close()
     zmq_context.destroy()
     sys.exit(0)
 
-signal.signal(signal.SIGINT, signal_handler)
+def main():
+    # Configure logging
+    logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 
-try:
-    # Configure SDR using settings from TOML file
-    sdr.sample_rate = config["sdr"]["sample_rate"]
-    sdr.center_freq = config["sdr"]["center_freq"]
-    sdr.freq_correction = config["sdr"]["freq_correction"]
-    sdr.gain = config["sdr"]["gain"]
-    sleep_time = config["sdr"]["sleep_time"]
+    # Load configuration from TOML file
+    config = toml.load("config.toml")
 
-    logger.info("SDR configured. Starting ZMQ publisher...")
+    # Validate config
+    try:
+        validate_config(config)
+    except KeyError as e:
+        logger.error(f"Configuration error: {e}")
+        sys.exit(1)
 
-    # Set up ZMQ context and PUB socket using settings from TOML file
-    zmq_context = zmq.Context()
-    publisher = zmq_context.socket(zmq.PUB)
-    publisher.bind(config["zmq"]["address"])
+    # Initialize SDR
+    sdr = RtlSdr()
 
-    while True:
-        samples = sdr.read_samples(2048)
-        samples_float32 = np.vstack((samples.real, samples.imag)).reshape((-1,), order='F').astype(np.float32)
-        #publisher.send(samples.tobytes())
-        publisher.send(samples_float32.tobytes())
-        logger.info("Published 2048 samples.")
-        sleep(sleep_time)
+    signal.signal(signal.SIGINT, signal_handler)
 
-except Exception as e:
-    logger.error(f"An error occurred: {e}")
-    sdr.close()
-    zmq_context.destroy()
+    try:
+        # Configure SDR using settings from TOML file
+        sdr.sample_rate = config["sdr"]["sample_rate"]
+        sdr.center_freq = config["sdr"]["center_freq"]
+        sdr.freq_correction = config["sdr"]["freq_correction"]
+        sdr.gain = config["sdr"]["gain"]
+        sleep_time = config["sdr"]["sleep_time"]
+
+        logger.info("SDR configured. Starting ZMQ publisher...")
+
+        # Set up ZMQ context and PUB socket using settings from TOML file
+        zmq_context = zmq.Context()
+        publisher = zmq_context.socket(zmq.PUB)
+        publisher.bind(config["zmq"]["address"])
+
+        while True:
+            samples = sdr.read_samples(2048)
+            samples_float32 = np.vstack((samples.real, samples.imag)).reshape((-1,), order='F').astype(np.float32)
+            #publisher.send(samples.tobytes())
+            publisher.send(samples_float32.tobytes())
+            logger.info("Published 2048 samples.")
+            sleep(sleep_time)
+
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        sdr.close()
+        zmq_context.destroy()
+
+#-------------------------
+if __name__ == '__main__':
+    main()
+    
