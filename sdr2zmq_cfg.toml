@@ -6,6 +6,7 @@ center_freq = 414e6     # Hz, center frequency for the SDR
 freq_correction = 60   # PPM, frequency correction
 sleep_time = 0.1       # seconds 
 gain = 0          # Gain setting
+lframe = 2048     # num samples in each frame
 
 # choose gain between [0.0, 0.9, 1.4, 2.7, 3.7, 7.7, 8.7,
 # 12.5, 14.4, 15.7, 16.6, 19.7, 20.7, 22.9, 25.4,
