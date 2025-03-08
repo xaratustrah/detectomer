@@ -40,7 +40,6 @@ class ZMQReceiver(MainWindowUI):
             + self.data_center_freq
         )
         
-        print('doin it', self.freqs[0], self.freqs[int(self.data_lframe / 2)])
         self.hslider1.setValue(int(self.freqs[0]))
         self.update_hslider1_label()
         self.hslider2.setValue(int(self.freqs[int(self.data_lframe / 2)]))
