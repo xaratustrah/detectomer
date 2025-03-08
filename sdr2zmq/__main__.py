@@ -59,11 +59,15 @@ def main():
     # Configure logging
     logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 
-    # Initialize SDR
-    sdr = RtlSdr()
-
     signal.signal(signal.SIGINT, signal_handler)
 
+    # Initialize SDR
+    try:
+        sdr = RtlSdr()
+    except:
+        logger.error(f"Maybe SDR device is not connected : {e}")
+        sys.exit()
+        
     try:
         # Configure SDR using settings from TOML file
         sdr.sample_rate = config["sdr"]["sample_rate"]
