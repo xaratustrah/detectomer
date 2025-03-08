@@ -6,6 +6,8 @@ port = "5555"
 
 [data]
 lframe = 2048
+sample_rate = 2.048e6 # Hz, center frequency for the SDR
+center_freq = 410e6   # Hz, center frequency for the SDR
 
 [graph]
 ymax = 10
