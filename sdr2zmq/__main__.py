@@ -41,7 +41,7 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 def main():
-    parser = argparse.ArgumentParser(description="sdr2zmq")
+    parser = argparse.ArgumentParser(description="sdr2zmq - captures RTL-SDR and publish over ZMQ")
     parser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
 
     args = parser.parse_args()
