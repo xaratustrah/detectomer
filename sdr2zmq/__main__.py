@@ -8,15 +8,22 @@ import signal
 import sys
 import zmq
 import toml
+import argparse
 import numpy as np
 from time import sleep
 from loguru import logger
 from rtlsdr import RtlSdr
 
+def load_config(config_file):
+    """Load configuration from a JSON file."""
+    with open(config_file, 'r') as file:
+        config = toml.load(file)
+    return config
+
 # Function to validate the presence of required keys in the config
 def validate_config(config):
     required_keys = {
-        "sdr": ["sample_rate", "center_freq", "freq_correction", "gain"],
+        "sdr": ["sample_rate", "center_freq", "freq_correction", "gain", 'sleep_time'],
         "zmq": ["address"]
     }
 
@@ -34,11 +41,13 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 def main():
-    # Configure logging
-    logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
+    parser = argparse.ArgumentParser(description="sdr2zmq")
+    parser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
+
+    args = parser.parse_args()
 
     # Load configuration from TOML file
-    config = toml.load("config.toml")
+    config = load_config(args.config)
 
     # Validate config
     try:
@@ -46,6 +55,9 @@ def main():
     except KeyError as e:
         logger.error(f"Configuration error: {e}")
         sys.exit(1)
+
+    # Configure logging
+    logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 
     # Initialize SDR
     sdr = RtlSdr()
@@ -83,4 +95,3 @@ def main():
 #-------------------------
 if __name__ == '__main__':
     main()
-    
