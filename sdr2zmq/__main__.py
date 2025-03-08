@@ -66,7 +66,7 @@ def main():
         sdr = RtlSdr()
         
     except Exception as e:
-        logger.error(f"Maybe SDR device is not connected : {e}")
+        logger.error(f"Maybe SDR device is not connected.")
         sys.exit()
         
     try:
