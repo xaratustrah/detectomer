@@ -2,7 +2,7 @@
 
 [sdr]
 sample_rate = 2.048e6  # Hz, sample rate for the SDR
-center_freq = 414e6     # Hz, center frequency for the SDR
+center_freq = 410e6     # Hz, center frequency for the SDR
 freq_correction = 60   # PPM, frequency correction
 sleep_time = 0.1       # seconds 
 gain = 0          # Gain setting
