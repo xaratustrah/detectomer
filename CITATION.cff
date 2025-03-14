@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Sanjari"
+  given-names: "Shahab"
+  orcid: "https://orcid.org/0000-0001-7321-0429"
+title: "detectomer"
+version: 1.0.1
+doi: 10.5281/zenodo.15024414
+date-released: 2025-03-14
+url: "https://github.com/xaratustrah/detectomer"
