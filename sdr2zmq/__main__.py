@@ -41,7 +41,6 @@ def signal_handler(sig, frame, sdr, zmq_context):
     sys.exit(0)
 
 def main():
-    #signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, sdr, zmq_context))
 
     parser = argparse.ArgumentParser(description="sdr2zmq - captures RTL-SDR and publish over ZMQ")
