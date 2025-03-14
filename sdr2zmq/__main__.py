@@ -34,8 +34,8 @@ def validate_config(config):
             if key not in config[section]:
                 raise KeyError(f"Missing key: {key} in section: {section}")
 
-def signal_handler(sig, frame):
-    logger.info("Cancellation received, closing devices.")
+def signal_handler(sig, frame, sdr, zmq_context):
+    logger.info('Exiting gracefully...')
     sdr.close()
     zmq_context.destroy()
     sys.exit(0)
@@ -59,8 +59,6 @@ def main():
     # Configure logging
     logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 
-    signal.signal(signal.SIGINT, signal_handler)
-
     # Initialize SDR
     try:
         sdr = RtlSdr()
@@ -68,6 +66,9 @@ def main():
     except Exception as e:
         logger.error(f"Maybe SDR device is not connected. Aborting...")
         sys.exit()
+
+    #signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, sdr, zmq_context))
         
     try:
         # Configure SDR using settings from TOML file
@@ -87,6 +88,7 @@ def main():
 
         while True:
             samples = sdr.read_samples(lframe)
+            # original samples are float64
             samples_float32 = np.vstack((samples.real, samples.imag)).reshape((-1,), order='F').astype(np.float32)
             #publisher.send(samples.tobytes())
             publisher.send(samples_float32.tobytes())
