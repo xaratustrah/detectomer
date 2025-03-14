@@ -41,6 +41,9 @@ def signal_handler(sig, frame, sdr, zmq_context):
     sys.exit(0)
 
 def main():
+    #signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, sdr, zmq_context))
+
     parser = argparse.ArgumentParser(description="sdr2zmq - captures RTL-SDR and publish over ZMQ")
     parser.add_argument("--config", type=str, required=True, help="Path to the configuration file")
 
@@ -66,9 +69,6 @@ def main():
     except Exception as e:
         logger.error(f"Maybe SDR device is not connected. Aborting...")
         sys.exit()
-
-    #signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGINT, lambda sig, frame: signal_handler(sig, frame, sdr, zmq_context))
         
     try:
         # Configure SDR using settings from TOML file
