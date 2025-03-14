@@ -1,4 +1,5 @@
 # detectomer - Software Defined Radio based conditional accelerator trigger on spectral power
+[DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15024414.svg)](https://doi.org/10.5281/zenodo.15024414)
 
 <div style="margin-left:auto;margin-right:auto;text-align:center">
 <img src="https://raw.githubusercontent.com/xaratustrah/detectomer/master/rsrc/detectomer.png" width="512">
