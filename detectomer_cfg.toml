@@ -8,6 +8,10 @@ port = "5555"
 url = "tcp://localhost"
 port = "5556"
 
+[rest]
+url = "tcp://localhost:5557"
+SCID = 2222
+
 [data]
 lframe = 2048
 sample_rate = 2.048e6 # Hz, center frequency for the SDR
@@ -24,9 +28,3 @@ xunit = "Hz"
 [window]
 xsize = 800
 ysize = 600
-
-[rest]
-url = "tcp://localhost:5557"
-SCID = 2222
-
-
