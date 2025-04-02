@@ -47,6 +47,8 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.rest_hold_time_spinbox.setValue(1)
         self.rest_hold_time_spinbox.setDisabled(True)
 
+        self.triggerbox_checkbox = QtWidgets.QCheckBox('Send to Trig. Box')
+
         self.log_filename = QtWidgets.QLineEdit(self)
         self.log_filename.setPlaceholderText("Log file name")
         self.log_filename.setDisabled(True)
@@ -84,6 +86,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
         label_layout2.addWidget(self.rest_checkbox)
         label_layout2.addWidget(self.rest_hold_time_label)
         label_layout2.addWidget(self.rest_hold_time_spinbox)
+        label_layout2.addWidget(self.triggerbox_checkbox)
         label_layout2.addWidget(self.log_checkbox)
         label_layout2.addWidget(self.log_filename)
 
@@ -218,8 +221,11 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 with open(file_name, 'r') as file:
                     config = toml.load(file)
 
-                self.zmq_url = config['zmq']['url']
-                self.zmq_port = config['zmq']['port']
+                self.zmq_sdr_url = config['zmq_sdr']['url']
+                self.zmq_sdr_port = config['zmq_sdr']['port']
+                self.zmq_trigger_url = config['zmq_trigger']['url']
+                self.zmq_trigger_port = config['zmq_trigger']['port']
+                
                 self.data_lframe = config['data']['lframe']
                 self.data_sample_rate = config['data']['sample_rate']
                 self.data_center_freq = config['data']['center_freq']
@@ -252,7 +258,7 @@ class MainWindowUI(QtWidgets.QMainWindow):
 
                 self.resize(self.window_xsize, self.window_ysize)
 
-                self.statusBar().showMessage(f"Config Loaded: ZMQ URL - {self.zmq_url}, Port - {self.zmq_port}")
+                self.statusBar().showMessage(f"Config Loaded: ZMQ URL - {self.zmq_sdr_url}, Port - {self.zmq_sdr_port}")
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self, "Error", f"Failed to load config file: {e}")
 

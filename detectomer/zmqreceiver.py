@@ -3,6 +3,7 @@ import numpy as np
 from pyqtgraph.Qt import QtCore, QtWidgets
 import requests
 import warnings
+import datetime
 from requests.exceptions import HTTPError
 from .mainwindow_ui import MainWindowUI
 
@@ -18,10 +19,14 @@ class ZMQReceiver(MainWindowUI):
     def __init__(self):
         super().__init__()
 
-        self.context = zmq.Context()
-
+        self.zmq_context_sdr = zmq.Context()
+        self.zmq_context_trigger = zmq.Context()
+        
         self.run_button.clicked.connect(self.start_receiving)
+        self.run_button.clicked.connect(self.start_trigger_server)
+        
         self.stop_button.clicked.connect(self.stop_receiving)
+        self.stop_button.clicked.connect(self.stop_trigger_server)
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
@@ -29,7 +34,7 @@ class ZMQReceiver(MainWindowUI):
         self.rest_message_sent = False
 
     def start_receiving(self):
-        if not hasattr(self, "zmq_url") or not hasattr(self, "zmq_port"):
+        if not hasattr(self, "zmq_sdr_url") or not hasattr(self, "zmq_sdr_port"):
             QtWidgets.QMessageBox.warning(
                 self, "Error", "Please load a valid config file."
             )
@@ -48,27 +53,27 @@ class ZMQReceiver(MainWindowUI):
         self.graph_widget.setXRange(np.min(self.freqs), np.max(self.freqs))
 
         try:
-            address = f"{self.zmq_url}:{self.zmq_port}"
-            self.socket = self.context.socket(zmq.SUB)
-            self.socket.connect(address)
-            self.socket.setsockopt(zmq.SUBSCRIBE, b"")
-            self.socket.setsockopt(zmq.CONFLATE, 1)  # Keep only the most recent message
+            address = f"{self.zmq_sdr_url}:{self.zmq_sdr_port}"
+            self.socket_sdr = self.zmq_context_sdr.socket(zmq.SUB)
+            self.socket_sdr.connect(address)
+            self.socket_sdr.setsockopt(zmq.SUBSCRIBE, b"")
+            self.socket_sdr.setsockopt(zmq.CONFLATE, 1)  # Keep only the most recent message
             self.timer.start(100)
         except Exception as e:
             QtWidgets.QMessageBox.warning(self, "Error", f"Failed to connect: {e}")
 
     def stop_receiving(self):
         self.timer.stop()
-        if hasattr(self, "socket"):
-            self.socket.close()
-            del self.socket
+        if hasattr(self, "socket_sdr"):
+            self.socket_sdr.close()
+            del self.socket_sdr
 
     def update_plot(self):
         try:
-            if not hasattr(self, "socket"):
-                raise AttributeError("'ZMQReceiver' object has no attribute 'socket'")
+            if not hasattr(self, "socket_sdr"):
+                raise AttributeError("'ZMQReceiver' object has no attribute 'socket_sdr'")
 
-            data = self.socket.recv(flags=zmq.NOBLOCK)
+            data = self.socket_sdr.recv(flags=zmq.NOBLOCK)
             received_array = np.frombuffer(data, dtype=np.float32)
             
             fft_data = np.abs(np.fft.fftshift(np.fft.fft(received_array))) ** 2
@@ -124,9 +129,13 @@ class ZMQReceiver(MainWindowUI):
             ):
                 if self.rest_checkbox.isChecked():
                     self.toggle_rest_message()
+                    if self.triggerbox_checkbox.isChecked():
+                        self.actually_send_to_triggerbox()
                 else:
                     self.only_show_message()
                     self.writeLog()
+                    if self.triggerbox_checkbox.isChecked():
+                        self.actually_send_to_triggerbox()
 
             if graph_min < self.vslider.value() and self.invert_checkbox.isChecked():
                 if self.rest_checkbox.isChecked():
@@ -137,10 +146,10 @@ class ZMQReceiver(MainWindowUI):
 
         except zmq.Again:
             pass
-        except ValueError:
-            pass
-        except AttributeError:
-            QtWidgets.QMessageBox.warning(self, "Error", "Please enter ZMQ address and port")
+        # except ValueError:
+        #     pass
+        # except AttributeError:
+        #     QtWidgets.QMessageBox.warning(self, "Error", "Please enter ZMQ address and port")
 
     def toggle_rest_message(self):
         if self.rest_message_sent:
@@ -212,3 +221,30 @@ class ZMQReceiver(MainWindowUI):
             finally:
                 # clear up anyways
                 self.clear_up_statusbar()
+
+
+    # ------------ trigger section
+
+    def start_trigger_server(self):
+        address = f"{self.zmq_trigger_url}:{self.zmq_trigger_port}"
+        # print(f"Trigger server started on {address}")
+        self.socket_trigger = self.zmq_context_trigger.socket(zmq.PUB)
+        try:
+            self.socket_trigger.bind(address)
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(self, "Error", f"Failed to connect: {e}")
+
+    def stop_trigger_server(self):
+        self.timer.stop()
+        if hasattr(self, "socket_trigger"):
+            self.socket_trigger.close()
+            del self.socket_trigger
+            # print(f"Trigger server stopped.")
+            
+    def actually_send_to_triggerbox(self):
+        topic = '10002'  # just a number for identification
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d@%H:%M:%S.%f')
+        self.socket_trigger.send_string("{} {}".format(topic, current_time))
+        # print('sent to trigger box!')
+
+    

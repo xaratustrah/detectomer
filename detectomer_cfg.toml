@@ -1,8 +1,12 @@
 # Settings for detectomer
 
-[zmq]
+[zmq_sdr]
 url = "tcp://localhost"
 port = "5555"
+
+[zmq_trigger]
+url = "tcp://localhost"
+port = "5556"
 
 [data]
 lframe = 2048
@@ -22,7 +26,7 @@ xsize = 800
 ysize = 600
 
 [rest]
-url = "tcp://localhost:5556"
+url = "tcp://localhost:5557"
 SCID = 2222
 
 
