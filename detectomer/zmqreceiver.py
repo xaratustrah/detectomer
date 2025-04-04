@@ -30,8 +30,10 @@ class ZMQReceiver(MainWindowUI):
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
-
-        self.rest_message_sent = False
+        
+        self.busy_triggerbox = False
+        self.busy_statusbar_show = False
+        self.busy_rest_interface = False
 
     def start_receiving(self):
         if not hasattr(self, "zmq_sdr_url") or not hasattr(self, "zmq_sdr_port"):
@@ -123,66 +125,58 @@ class ZMQReceiver(MainWindowUI):
 
             self.graph_max_label.setText(f"Graph Max: {graph_max:.2f} dBm")
 
+            # here comes all the triggering etc.
+            
             if (
                 graph_max > self.vslider.value()
                 and not self.invert_checkbox.isChecked()
             ):
                 if self.rest_checkbox.isChecked():
-                    self.toggle_rest_message()
+                    self.send_to_rest_interface()
                     if self.triggerbox_checkbox.isChecked():
-                        self.actually_send_to_triggerbox()
+                        self.send_to_triggerbox()
                 else:
-                    self.only_show_message()
+                    self.statusbar_show()
                     self.writeLog()
                     if self.triggerbox_checkbox.isChecked():
-                        self.actually_send_to_triggerbox()
+                        self.send_to_triggerbox()
 
             if graph_min < self.vslider.value() and self.invert_checkbox.isChecked():
                 if self.rest_checkbox.isChecked():
-                    self.toggle_rest_message()
+                    self.send_to_rest_interface()
                 else:
-                    self.only_show_message()
+                    self.statusbar_show()
                     self.writeLog()
 
         except zmq.Again:
             pass
-        # except ValueError:
-        #     pass
-        # except AttributeError:
-        #     QtWidgets.QMessageBox.warning(self, "Error", "Please enter ZMQ address and port")
+        except ValueError:
+            pass
+        except AttributeError:
+            QtWidgets.QMessageBox.warning(self, "Error", "Please enter ZMQ address and port")
 
-    def toggle_rest_message(self):
-        if self.rest_message_sent:
-            self.actually_send_rest_message(False)
-            self.rest_message_sent = False
+    # ------------ REST interface
+    
+    def send_to_rest_interface(self):
+        if self.busy_rest_interface:
+            print('REST interface is busy.')
         else:
-            QtCore.QTimer.singleShot(
-                self.rest_hold_time_spinbox.value() * 1000, self.toggle_rest_message
-            )
-            self.rest_message_sent = True
+            self.busy_rest_interface = True
             self.actually_send_rest_message(True)
 
-    def only_show_message(self):
-        self.statusBar().setStyleSheet(
-            "background-color: red; color: white; font-weight: bold;"
-        )
-        self.statusBar().showMessage("Threshold crossed, no message sent.")
-        QtCore.QTimer.singleShot(300, self.clear_up_statusbar)
-
-    def clear_up_statusbar(self):
-        self.statusBar().setStyleSheet("")
-        self.statusBar().clearMessage()
-
+            QtCore.QTimer.singleShot(self.hold_time_spinbox.value() * 1000, self.busy_rest_interface_reset)
+            
+    def busy_rest_interface_reset(self):
+        self.busy_rest_interface = False
+        self.actually_send_rest_message(False)
+        self.rest_checkbox.setStyleSheet('')
+        
     def actually_send_rest_message(self, status):
         headers = {"Content-Type": "application/json"}
 
         if status:
-            self.statusBar().setStyleSheet(
-                "background-color: purple; color: yellow; font-weight: bold;"
-            )
-            self.statusBar().showMessage(
-                f"Threshold crossed, holding REST message for {self.rest_hold_time_spinbox.value()} [s]"
-            )
+            self.rest_checkbox.setStyleSheet('background-color: purple')
+
             data = {
                 "dynamicSignals": [{"enabled": True, "id": self.rest_scid}],
                 "staticSignals": [],
@@ -220,10 +214,9 @@ class ZMQReceiver(MainWindowUI):
 
             finally:
                 # clear up anyways
-                self.clear_up_statusbar()
+                self.rest_checkbox.setStyleSheet('')
 
-
-    # ------------ trigger section
+    # ------------ trigger box section
 
     def start_trigger_server(self):
         address = f"{self.zmq_trigger_url}:{self.zmq_trigger_port}"
@@ -241,10 +234,36 @@ class ZMQReceiver(MainWindowUI):
             del self.socket_trigger
             # print(f"Trigger server stopped.")
             
-    def actually_send_to_triggerbox(self):
-        topic = '10002'  # just a number for identification
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d@%H:%M:%S.%f')
-        self.socket_trigger.send_string("{} {}".format(topic, current_time))
-        # print('sent to trigger box!')
+    def send_to_triggerbox(self):
+        if self.busy_triggerbox:
+            print('Trigger box show is busy.')
+        else:
+            self.busy_triggerbox = True
+            topic = '10002'  # just a number for identification
+            current_time = datetime.datetime.now().strftime('%Y-%m-%d@%H:%M:%S.%f')
+            self.socket_trigger.send_string("{} {}".format(topic, current_time))
+            self.triggerbox_checkbox.setStyleSheet('background-color: green')
+            QtCore.QTimer.singleShot(self.hold_time_spinbox.value() * 1000, self.busy_triggerbox_reset)
+            
+    def busy_triggerbox_reset(self):
+        self.busy_triggerbox = False
+        self.triggerbox_checkbox.setStyleSheet('')
 
-    
+
+    # ------------ Statusbar section
+
+    def statusbar_show(self):
+        if self.busy_statusbar_show:
+            print('Status bar show is busy.')
+        else:
+            self.busy_statusbar_show = True
+            self.statusBar().setStyleSheet(
+                "background-color: red; color: white; font-weight: bold;"
+            )
+            self.statusBar().showMessage("Threshold crossed. Check button colors to see which messages were sent.")
+            QtCore.QTimer.singleShot(2000, self.busy_statusbar_show_reset)
+            
+    def busy_statusbar_show_reset(self):
+        self.busy_statusbar_show = False
+        self.statusBar().setStyleSheet("")
+        self.statusBar().clearMessage()

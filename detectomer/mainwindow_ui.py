@@ -38,14 +38,11 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.log_checkbox.stateChanged.connect(self.toggle_log_checkbox)
 
         self.rest_checkbox = QtWidgets.QCheckBox('Send REST')
-        self.rest_checkbox.stateChanged.connect(self.toggle_rest_checkbox)
         
-        self.rest_hold_time_label = QtWidgets.QLabel('Hold time [s]:')
-        self.rest_hold_time_label.setDisabled(True)
-        self.rest_hold_time_spinbox = QtWidgets.QSpinBox()
-        self.rest_hold_time_spinbox.setRange(0, 9999)  # Set range from 0 to 100
-        self.rest_hold_time_spinbox.setValue(1)
-        self.rest_hold_time_spinbox.setDisabled(True)
+        self.hold_time_label = QtWidgets.QLabel('Hold time [s]:')
+        self.hold_time_spinbox = QtWidgets.QSpinBox()
+        self.hold_time_spinbox.setRange(0, 9999)  # Set range from 0 to 100
+        self.hold_time_spinbox.setValue(1)
 
         self.triggerbox_checkbox = QtWidgets.QCheckBox('Send to Trig. Box')
 
@@ -84,9 +81,9 @@ class MainWindowUI(QtWidgets.QMainWindow):
         
         label_layout2 = QtWidgets.QHBoxLayout()
         label_layout2.addWidget(self.rest_checkbox)
-        label_layout2.addWidget(self.rest_hold_time_label)
-        label_layout2.addWidget(self.rest_hold_time_spinbox)
         label_layout2.addWidget(self.triggerbox_checkbox)
+        label_layout2.addWidget(self.hold_time_label)
+        label_layout2.addWidget(self.hold_time_spinbox)
         label_layout2.addWidget(self.log_checkbox)
         label_layout2.addWidget(self.log_filename)
 
@@ -160,14 +157,6 @@ class MainWindowUI(QtWidgets.QMainWindow):
         self.red_line = self.graph_widget.addLine(y=self.vslider.value(), pen=pg.mkPen('r', width=1))
         self.green_line_1 = self.graph_widget.addLine(x=self.hslider1.value(), y=0, pen=pg.mkPen('g', width=1))
         self.green_line_2 = self.graph_widget.addLine(x=self.hslider2.value(), y=0, pen=pg.mkPen('g', width=1))
-
-    def toggle_rest_checkbox(self, state):
-        if state == 2:  # Checked
-            self.rest_hold_time_spinbox.setDisabled(False)
-            self.rest_hold_time_label.setDisabled(False)
-        else:
-            self.rest_hold_time_spinbox.setDisabled(True)
-            self.rest_hold_time_label.setDisabled(True)
 
     def toggle_invert_checkbox(self, state):
         if state == 2:  # Checked
