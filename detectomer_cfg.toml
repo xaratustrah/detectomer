@@ -24,6 +24,7 @@ xmax = 1000
 xmin = 0
 yunit = "dBm"
 xunit = "Hz"
+avg_depth = 10
 
 [window]
 xsize = 800

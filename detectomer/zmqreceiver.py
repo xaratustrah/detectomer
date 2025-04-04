@@ -34,6 +34,15 @@ class ZMQReceiver(MainWindowUI):
         self.busy_triggerbox = False
         self.busy_statusbar_show = False
         self.busy_rest_interface = False
+        
+    def get_moving_average(self, new_array):      
+        if len(self.avg_buffer) < self.graph_avg_depth:
+            self.avg_buffer = np.vstack((self.avg_buffer, new_array))
+        else:
+            # Discard the oldest value and append the new one
+            self.avg_buffer = np.roll(self.avg_buffer, -1, axis = 0)  # Shift all elements to the left
+            self.avg_buffer[-1] = new_array  # Add the new value at the end
+        return np.mean(self.avg_buffer, axis=0)
 
     def start_receiving(self):
         if not hasattr(self, "zmq_sdr_url") or not hasattr(self, "zmq_sdr_port"):
@@ -88,6 +97,8 @@ class ZMQReceiver(MainWindowUI):
                 pass
                 #fft_data = np.where(np.isfinite(10 * np.log10(fft_data)), 10 * np.log10(fft_data), 1)
 
+            fft_data = self.get_moving_average(fft_data)
+            
             if self.invert_checkbox.isChecked():
                 fft_data = -fft_data - int(self.ref_value_spinbox.value())
             else:
