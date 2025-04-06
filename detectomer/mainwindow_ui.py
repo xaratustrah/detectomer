@@ -227,7 +227,9 @@ class MainWindowUI(QtWidgets.QMainWindow):
                 self.graph_yunit = config['graph']['yunit']
                 self.graph_avg_depth = config['graph']['avg_depth']
 
-                self.avg_buffer = np.zeros((1, self.data_lframe))  # Start buffer with an empty array must be a 1D Vector!!!
+                # Start buffer with an empty array must be a 1D Vector
+                # and have double size for complex vectors!!!
+                self.avg_buffer = np.zeros((1, 2 * self.data_lframe))
 
                 self.window_xsize = config['window']['xsize']
                 self.window_ysize = config['window']['ysize']
